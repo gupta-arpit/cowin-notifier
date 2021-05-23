@@ -1,14 +1,11 @@
 import axios from 'axios';
 
 window.onbeforeunload = function(){
-    sessionStorage.setItem("origin", window.location.href);
+    sessionStorage.clear();
 }
 
 window.onload = function(){
-    if(window.location.href === sessionStorage.getItem("origin")){
-        this.console.log("clearing storage");
-        sessionStorage.clear();
-    }
+    sessionStorage.clear();
 }
 
 const SlotNotifier = () => {
@@ -45,6 +42,16 @@ const SlotNotifier = () => {
         </span> => ${line} <br/>`;
     }
 
+    async function handle401(err) {
+        const href = "https://selfregistration.cowin.gov.in";
+        const msg = `Received 401. Login to co-win to activate your session. Click <a style="color:white" href=${href}>here</a>`;
+        addLine(err || msg);
+        console.log("sending 401 notif");
+        showNotification(msg, href);
+        // reload page after 20s
+        setTimeout(window.location.reload.bind(window.location), 20000);
+    }
+
     async function getAllData(){
         let allPinCodes = [473660];
         allPinCodes.forEach(pincode => {
@@ -66,11 +73,7 @@ const SlotNotifier = () => {
                     console.log(response);
                     const status = response.status;
                     if (status === 401) {
-                        addLine("401");
-                        const msg = "Received 401. Login to cowin to activate your session.";
-                        showNotification(msg, 'https://selfregistration.cowin.gov.in')
-                        // reload page after 20s
-                        setTimeout(window.location.reload.bind(window.location), 20000);
+                        handle401();
                     }
 
                     if(status === 200){
@@ -87,10 +90,12 @@ const SlotNotifier = () => {
                         })
                     }
                 }).catch(err => {
-                    addLine(err);
+                    handle401();
                 })
         });
     }
+
+    // to avoid creating multiple intervals on re-render event from the parent
     let started = window.sessionStorage.getItem('started') || false;
     if (!started) {
         setInterval(getAllData, 15000);
@@ -101,8 +106,6 @@ const SlotNotifier = () => {
     return (
         <div>
             <div id="slot-details">
-            </div>
-            <div class="slot-error">
             </div>
         </div>
     )

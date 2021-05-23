@@ -36,3 +36,7 @@
     transform: rotate(360deg);
   }
 }
+
+.slot-details {
+  overflow-y: scroll;
+}
