@@ -1,5 +1,5 @@
 1. Clone repository: `git clone git@github.com:gupta-arpit/cowin-notifier.git`
-2. Go to repo and run following commands:
+2. Go to `cowin-notifier` and run following commands:
  ```
 npm install
 npm start
