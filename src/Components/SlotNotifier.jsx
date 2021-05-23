@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useState } from 'react';
 
 window.onbeforeunload = function(){
     sessionStorage.clear();
@@ -9,6 +10,19 @@ window.onload = function(){
 }
 
 const SlotNotifier = () => {
+    const getPincode = () => {
+        return localStorage.getItem('pincode') || "473660";
+    }
+
+    const setPincodeWrapper = (pin) => {
+        localStorage.setItem('pincode', pin);
+        setShouldPoll(false);
+        setPincode(pin);
+    }
+
+    const [pincode, setPincode] = useState(getPincode());
+    const [shouldPoll, setShouldPoll] = useState(true); // hack: maintaining poll to avoid running parallel js intervals
+
     async function showNotification(msg, redirectLink) {
         const notification = new Notification(msg);
 
@@ -48,12 +62,10 @@ const SlotNotifier = () => {
         addLine(err || msg);
         console.log("sending 401 notif");
         showNotification(msg, href);
-        // reload page after 20s
-        setTimeout(window.location.reload.bind(window.location), 20000);
     }
 
     async function getAllData(){
-        let allPinCodes = [473660];
+        let allPinCodes = [getPincode()];
         allPinCodes.forEach(pincode => {
             let date = new Date();
             date.setDate(date.getDate() + 1); // search for next day
@@ -97,14 +109,18 @@ const SlotNotifier = () => {
 
     // to avoid creating multiple intervals on re-render event from the parent
     let started = window.sessionStorage.getItem('started') || false;
-    if (!started) {
-        setInterval(getAllData, 15000);
+    if (!started && shouldPoll) {
+        setInterval(getAllData, 15 * 1000);
         window.sessionStorage.setItem('started', true);
         getAllData();
     }
 
     return (
         <div>
+            <div id="pincode">
+                <label>Pincode:</label>
+                <input value={pincode} onChange={e => setPincodeWrapper(e.target.value)} />
+            </div>
             <div id="slot-details">
             </div>
         </div>

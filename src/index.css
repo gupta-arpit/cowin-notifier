@@ -11,3 +11,31 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+#pincode {
+  position: fixed;
+  left: 10px;
+  top: 10px;
+}
+
+#pincode input {
+  height: 30px;
+  font-size: 20px;
+  padding: 2px;
+  padding-left: 10px;
+  width: 90px;
+}
+
+#query-interval {
+  position: fixed;
+  left: 10px;
+  top: 50px;
+}
+
+#query-interval input {
+  height: 30px;
+  font-size: 20px;
+  padding: 2px;
+  padding-left: 10px;
+  width: 40px;
+}
